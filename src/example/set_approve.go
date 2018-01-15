@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/sinyakinilya/sc-client/src/ethereum-client"
+	"github.com/sinyakinilya/sc-client/src/ethereum-client/helper"
 	"math/big"
 	"net/http"
 )
@@ -12,7 +13,7 @@ func main() {
 	EthereumClient := ethereum_client.EthereumClient{HttpClient: &http.Client{}}
 	SCOwnerAddress := ethereum_client.SCOwnerAddress
 	SCAddress := ethereum_client.SCAddress
-	erc20 := ethereum_client.ERC20{}
+	erc20 := helper.ERC20{}
 	amount := new(big.Int)
 
 	amount.SetString("100000000000000", 0)
@@ -29,7 +30,7 @@ func main() {
 	etherAmount := new(big.Int)
 	etherAmount.Mul(gas, gasPrice)
 	hexAmount := fmt.Sprintf("0x%x", etherAmount)
-	tt := ethereum_client.Ether(etherAmount).Text('f', 18)
+	tt := helper.Ether(etherAmount).Text('f', 18)
 	fmt.Println(gas, gasPrice, etherAmount, hexAmount, tt)
 
 	//txSendEtherParam := model.GethSendTransactionParams{

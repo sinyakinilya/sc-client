@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/sinyakinilya/sc-client/src/ethereum-client"
+	"github.com/sinyakinilya/sc-client/src/ethereum-client/helper"
 	"math/big"
 	"net/http"
 	"strings"
@@ -17,7 +18,7 @@ type TokenTransfer struct {
 
 func main() {
 	EthereumClient := ethereum_client.EthereumClient{HttpClient: &http.Client{}}
-	erc20 := ethereum_client.ERC20{}
+	erc20 := helper.ERC20{}
 	lastBlock, _ := EthereumClient.GetLastBlockNumber()
 	lastBlock = 2301917
 

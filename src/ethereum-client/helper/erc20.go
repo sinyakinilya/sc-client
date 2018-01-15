@@ -1,4 +1,4 @@
-package ethereum_client
+package helper
 
 import (
 	"errors"

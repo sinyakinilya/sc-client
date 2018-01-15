@@ -33,18 +33,14 @@ func main() {
 	tt := helper.Ether(etherAmount).Text('f', 18)
 	fmt.Println(gas, gasPrice, etherAmount, hexAmount, tt)
 
-	//txSendEtherParam := model.GethSendTransactionParams{
-	//	From:     SCOwnerAddress,
-	//	To:       TokenHolderAddress,
-	//	Value:    hexAmount,
-	//	Gas:      fmt.Sprintf("0x%x", 100000),
-	//	GasPrice: txApproveParams.GasPrice,
-	//	Data:     "",
+	//txSendEtherParam, err := EthereumClient.CreateTxParams(SCOwnerAddress, TokenHolderAddress, hexAmount, "")
+	//if err != nil {
+	//	panic(err)
 	//}
 
 	//	txHash := "0x087e92bd65e741195fba681648682136ce0c37faa4096a1e0f3a6400ef95bdcf"
 	// 0x087e92bd65e741195fba681648682136ce0c37faa4096a1e0f3a6400ef95bdcf
-
+	//
 	txHash, err := EthereumClient.PersonalSendTransaction(txApproveParams, "test_test")
 	if err != nil {
 		panic(err)

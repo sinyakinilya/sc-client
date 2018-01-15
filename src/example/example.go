@@ -53,23 +53,21 @@ func main() {
 		fmt.Println(decBalance, hexBalance)
 	*/
 
-	/*
-		// 0x7cb08d516a72dcd0c55f39ae647d5d19aebf2ad9
-		qty := new(big.Int)
-		qty.SetString("10000000000", 10)
+	// 0x7cb08d516a72dcd0c55f39ae647d5d19aebf2ad9
+	qty := new(big.Int)
+	qty.SetString("10000000000", 10)
 
-		input := erc20.Transfer("0x7cb08d516a72dcd0c55f39ae647d5d19aebf2ad9", qty)
-		txParams, err := EthereumClient.CreateTxParams("0x978bEE7FBF556CA89FC542022c19b54A8662E501", ethereum_client.SCAddress, "0x0", input)
-		if err != nil {
-			panic(err)
-		}
-		fmt.Println(txParams)
-		txHash, err := EthereumClient.PersonalSendTransaction(txParams, "...............")
-		if err != nil {
-			panic(err)
-		}
-		fmt.Println(txHash)
-	*/
+	input := erc20.Transfer("0x7cb08d516a72dcd0c55f39ae647d5d19aebf2ad9", qty)
+	txParams, err := EthereumClient.CreateTxParams("0x978bEE7FBF556CA89FC542022c19b54A8662E501", ethereum_client.SCAddress, "0x0", input)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(txParams)
+	txHash, err := EthereumClient.PersonalSendTransaction(txParams, "...............")
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(txHash)
 
 	/*
 		address, err := EthereumClient.CreateNewAccount("test_test")
@@ -79,13 +77,11 @@ func main() {
 		fmt.Println(address)
 	*/
 
-	/*
-		addresses, err := EthereumClient.GetAccounts()
-		if err != nil {
-			panic(err)
-		}
-		fmt.Println(addresses)
-	*/
+	addresses, err := EthereumClient.GetAccounts()
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(addresses)
 
 	/*
 		txHash := "0x087e92bd65e741195fba681648682136ce0c37faa4096a1e0f3a6400ef95bdcf"

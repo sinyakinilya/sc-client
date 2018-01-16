@@ -2,7 +2,6 @@ package ethereum_client
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/sinyakinilya/sc-client/src/ethereum-client/model"
 )
 
@@ -45,7 +44,6 @@ func (ec EthereumClient) GetTransactionByHash(txHash string) (txData model.Ether
 	if err != nil {
 		return txData, err
 	}
-	fmt.Println(string(byteResponse))
 	if err := json.Unmarshal(byteResponse, &response); err != nil {
 		return txData, err
 	}
@@ -63,7 +61,6 @@ func (ec EthereumClient) GetTransactionReceipt(txHash string) (txData model.Ethe
 	if err != nil {
 		return txData, err
 	}
-	fmt.Println(string(byteResponse))
 	if err := json.Unmarshal(byteResponse, &response); err != nil {
 		return txData, err
 	}

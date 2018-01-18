@@ -4,15 +4,19 @@ import (
 	"encoding/json"
 	"math/big"
 	"github.com/sinyakinilya/sc-client/src/ethereum-client/model"
+	"fmt"
+	"github.com/sinyakinilya/sc-client/src/ethereum-client/helper"
+	"strings"
+	"errors"
 )
 
-func (ec EthereumClient) GetBalance(address string, blockNumber string) (dec *big.Int, hex string, err error) {
+func (ec EthereumClient) GetBalance(address string, blockNumber uint64) (dec *big.Int, hex string, err error) {
 	var (
 		response model.GethRPCResponse
 		params   []interface{}
 	)
 	dec = new(big.Int)
-	params = append(params, address, blockNumber)
+	params = append(params, address, fmt.Sprintf("0x%x", blockNumber))
 	byteResponse, err := ec.SendRequest("eth_getBalance", params)
 
 	if err != nil {
@@ -62,3 +66,93 @@ func (ec EthereumClient) GetAccounts() (address []string, err error) {
 
 	return response.Result, nil
 }
+
+func (ec EthereumClient) GetBuyerInfo(tx model.EthereumTransaction, scAddress string) (buyer string, err error) {
+	if strings.ToLower(tx.To) != SCAddress {
+		return buyer, errors.New("this transaction is not related to the smart contract")
+	}
+	erc20 := helper.ERC20{}
+
+	// check transfer signature
+	_, _, err = erc20.ParseTransferData(tx.Input)
+	if err != nil && err.Error() != "input is not transfer data" {
+		return buyer, err
+	}
+	if err == nil {
+		return tx.From, nil
+	}
+
+	// check transferFrom signature
+	from, _, _, err := erc20.ParseTransferFromData(tx.Input)
+	if err != nil && err.Error() != "input is not transferFrom data" {
+		return buyer, err
+	}
+
+	return from, nil
+}
+
+func (ec EthereumClient) GetTokenBalance(scAddress string, address string, blockNumber uint64) (dec *big.Int, hex string, err error) {
+	var (
+		response model.GethRPCResponse
+		params   []interface{}
+	)
+	dec = new(big.Int)
+	erc20 := helper.ERC20{}
+	balanceOfData, err := erc20.GetBalanceOf(address)
+	if err != nil {
+		return dec, hex, err
+	}
+	scParams := model.GethSendSmartContractParams{
+		To:scAddress,
+		Data: balanceOfData,
+	}
+
+	params = append(params, scParams, fmt.Sprintf("0x%x", blockNumber))
+	byteResponse, err := ec.SendRequest("eth_call", params)
+
+	if err != nil {
+		return dec, hex, err
+	}
+
+	if err := json.Unmarshal(byteResponse, &response); err != nil {
+		return dec, hex, err
+	}
+
+	dec.SetString(response.Result.(string), 0)
+
+	return dec, response.Result.(string), nil
+}
+
+func (ec EthereumClient) GetAllowance(scAddress string, owner string, spender string, blockNumber uint64) (dec *big.Int, hex string, err error) {
+	var (
+		response model.GethRPCResponse
+		params   []interface{}
+	)
+	dec = new(big.Int)
+	erc20 := helper.ERC20{}
+	allowanceData, err := erc20.GetAllowance(owner, spender)
+	if err != nil {
+		return dec, hex, err
+	}
+	scParams := model.GethSendSmartContractParams{
+		To:scAddress,
+		Data: allowanceData,
+	}
+
+	params = append(params, scParams, fmt.Sprintf("0x%x", blockNumber))
+	byteResponse, err := ec.SendRequest("eth_call", params)
+
+	if err != nil {
+		return dec, hex, err
+	}
+
+	if err := json.Unmarshal(byteResponse, &response); err != nil {
+		return dec, hex, err
+	}
+
+	dec.SetString(response.Result.(string), 0)
+
+	return dec, response.Result.(string), nil
+
+}
+

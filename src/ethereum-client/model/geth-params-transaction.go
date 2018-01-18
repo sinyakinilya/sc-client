@@ -8,3 +8,8 @@ type GethSendTransactionParams struct {
 	Value    string `json:"value"`
 	Data     string `json:"data"`
 }
+
+type GethSendSmartContractParams struct {
+	To       string `json:"to"`
+	Data     string `json:"data"`
+}

@@ -74,11 +74,5 @@ func (ec EthereumClient) GetTransactionStatus(txHash string) (status bool, err e
 		return false, err
 	}
 
-	if receipt.Status == "0x0" {
-		status = false
-	} else {
-		status = true
-	}
-
-	return status, nil
+	return receipt.Status == "0x1", nil
 }

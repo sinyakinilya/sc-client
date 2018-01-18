@@ -67,28 +67,32 @@ func (ec EthereumClient) GetAccounts() (address []string, err error) {
 	return response.Result, nil
 }
 
-func (ec EthereumClient) GetBuyerInfo(tx model.EthereumTransaction, scAddress string) (buyer string, err error) {
+func (ec EthereumClient) GetBuyerInfo(tx model.EthereumTransaction, scAddress string) (buyer string, sc model.ScMethod, err error) {
 	if strings.ToLower(tx.To) != SCAddress {
-		return buyer, errors.New("this transaction is not related to the smart contract")
+		return buyer, sc, errors.New("this transaction is not related to the smart contract")
 	}
 	erc20 := helper.ERC20{}
 
 	// check transfer signature
-	_, _, err = erc20.ParseTransferData(tx.Input)
+	to, amount, err := erc20.ParseTransferData(tx.Input)
 	if err != nil && err.Error() != "input is not transfer data" {
-		return buyer, err
+		return buyer, sc, err
 	}
 	if err == nil {
-		return tx.From, nil
+		sc.FunctionName = "transfer"
+		sc.Params = append(sc.Params, to, amount)
+		return tx.From, sc, nil
 	}
 
 	// check transferFrom signature
-	from, _, _, err := erc20.ParseTransferFromData(tx.Input)
+	from, to, amount, err := erc20.ParseTransferFromData(tx.Input)
 	if err != nil && err.Error() != "input is not transferFrom data" {
-		return buyer, err
+		return buyer, sc, err
 	}
+	sc.FunctionName = "transferFrom"
+	sc.Params = append(sc.Params, from, to, amount)
 
-	return from, nil
+	return from, sc, nil
 }
 
 func (ec EthereumClient) GetTokenBalance(scAddress string, address string, blockNumber uint64) (dec *big.Int, hex string, err error) {

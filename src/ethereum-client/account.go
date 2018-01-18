@@ -81,6 +81,9 @@ func (ec EthereumClient) GetBuyerInfo(tx model.EthereumTransaction, scAddress st
 	if err == nil {
 		sc.FunctionName = "transfer"
 		sc.Params = append(sc.Params, to, amount)
+		sc.Amount = amount.Uint64()
+		sc.To = to
+
 		return tx.From, sc, nil
 	}
 
@@ -91,6 +94,8 @@ func (ec EthereumClient) GetBuyerInfo(tx model.EthereumTransaction, scAddress st
 	}
 	sc.FunctionName = "transferFrom"
 	sc.Params = append(sc.Params, from, to, amount)
+	sc.Amount = amount.Uint64()
+	sc.To = to
 
 	return from, sc, nil
 }

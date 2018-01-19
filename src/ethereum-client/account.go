@@ -92,6 +92,9 @@ func (ec EthereumClient) GetBuyerInfo(tx model.EthereumTransaction, scAddress st
 	if err != nil && err.Error() != "input is not transferFrom data" {
 		return buyer, sc, err
 	}
+	if err.Error() == "input is not transferFrom data" {
+		return buyer, sc, errors.New("input data is not transfer/transferFrom call function")
+	}
 	sc.FunctionName = "transferFrom"
 	sc.Params = append(sc.Params, from, to, amount)
 	sc.Amount = amount.Uint64()
@@ -162,6 +165,23 @@ func (ec EthereumClient) GetAllowance(scAddress string, owner string, spender st
 	dec.SetString(response.Result.(string), 0)
 
 	return dec, response.Result.(string), nil
-
 }
 
+func (ec EthereumClient) UnlockAccount(address string, passphrase string, second int) (ok bool, err error) {
+	var (
+		response model.GethRPCResponse
+		params   []interface{}
+	)
+	params = append(params, address, passphrase, second)
+	byteResponse, err := ec.SendRequest("personal_unlockAccount", params)
+
+	if err != nil {
+		return false, err
+	}
+
+	if err := json.Unmarshal(byteResponse, &response); err != nil {
+		return false, err
+	}
+
+	return response.Result.(bool), nil
+}

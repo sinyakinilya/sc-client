@@ -20,15 +20,20 @@ func main() {
 	EthereumClient := ethereum_client.EthereumClient{HttpClient: &http.Client{}}
 	erc20 := helper.ERC20{}
 	lastBlock, _ := EthereumClient.GetLastBlockNumber()
-	lastBlock = 2463331
+	lastBlock = 4929009
 
-	for lastBlock > 2463300 {
+	for lastBlock > 4929007 {
 		fmt.Println("Current Block ", lastBlock)
 		txs, _ := EthereumClient.GetTransactionFromBlock(lastBlock)
 		transfers := []TokenTransfer{}
 		for _, tx := range txs {
 			if strings.ToLower(tx.To) != ethereum_client.SCAddress {
 				continue
+			}
+
+			_, sc, err := EthereumClient.GetBuyerInfo(tx, ethereum_client.SCAddress)
+			if err != nil {
+				fmt.Println(err, sc)
 			}
 
 			// check tx status
@@ -58,6 +63,8 @@ func main() {
 			if err == nil {
 				transfers = append(transfers, TokenTransfer{from: from, to: to, amountToken: amount, txHah: tx.Hash})
 			}
+
+
 
 		}
 

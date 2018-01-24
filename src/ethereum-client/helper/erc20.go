@@ -100,3 +100,17 @@ func (ERC20) ParseTransferFromData(input string) (from string, to string, amount
 	}
 	return from, to, amount, nil
 }
+
+func (ERC20) ParseApproveData(input string) (to string, amount *big.Int, err error) {
+	//0x095ea7b30000000000000000000000005237bc08b2fe644487366e246741bd7ec0eb24710000000000000000000000000000000000000000000000000000000005f5e100
+	if strings.Index(input, "0x095ea7b3") != 0 {
+		return to, amount, errors.New("input is not approve data")
+	}
+	to = "0x" + input[34:74]
+	amount = new(big.Int)
+	amount.SetString(input[74:], 16)
+	if !amount.IsUint64() {
+		return to, amount, errors.New("bad amount data")
+	}
+	return to, amount, nil
+}

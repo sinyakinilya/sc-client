@@ -68,7 +68,7 @@ func (ec EthereumClient) GetAccounts() (address []string, err error) {
 }
 
 func (ec EthereumClient) GetBuyerInfo(tx model.EthereumTransaction, scAddress string) (buyer string, sc model.ScMethod, err error) {
-	if strings.ToLower(tx.To) != SCAddress {
+	if strings.ToLower(tx.To) != scAddress {
 		return buyer, sc, errors.New("this transaction is not related to the smart contract")
 	}
 	erc20 := helper.ERC20{}
@@ -174,9 +174,17 @@ func (ec EthereumClient) UnlockAccount(address string, passphrase string, second
 	)
 	params = append(params, address, passphrase, second)
 	byteResponse, err := ec.SendRequest("personal_unlockAccount", params)
-
 	if err != nil {
-		return false, err
+		switch e := err.(type) {
+		case model.GethRPCError:
+			if (e.Code == -32000) && (strings.Compare(e.Message, "could not decrypt key with given passphrase") == 0) {
+				return false, nil
+			} else {
+				return ok, err
+			}
+		default:
+			return ok, err
+		}
 	}
 
 	if err := json.Unmarshal(byteResponse, &response); err != nil {

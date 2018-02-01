@@ -89,12 +89,13 @@ func (ec EthereumClient) GetBuyerInfo(tx model.EthereumTransaction, scAddress st
 
 	// check transferFrom signature
 	from, to, amount, err := erc20.ParseTransferFromData(tx.Input)
-	if err != nil && err.Error() != "input is not transferFrom data" {
+	if err != nil {
+		if err.Error() == "input is not transferFrom data" {
+			err = errors.New("input data is not transfer/transferFrom call function")
+		}
 		return buyer, sc, err
 	}
-	if err.Error() == "input is not transferFrom data" {
-		return buyer, sc, errors.New("input data is not transfer/transferFrom call function")
-	}
+
 	sc.FunctionName = "transferFrom"
 	sc.Params = append(sc.Params, from, to, amount)
 	sc.Amount = amount.Uint64()

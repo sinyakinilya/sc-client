@@ -27,6 +27,9 @@ func (ec EthereumClient) SendRequest(methodName string, params []interface{}) ([
 	}
 
 	response, err := ec.Request(requestBody)
+	if err != nil {
+		return nil, err
+	}
 	var errorResponse model.GethRPCResponseError
 
 	if err := json.Unmarshal(response, &errorResponse); err != nil {
@@ -52,5 +55,5 @@ func (ec EthereumClient) Request(requestBody []byte) ([]byte, error) {
 	defer resp.Body.Close()
 	responseBody, err := ioutil.ReadAll(resp.Body)
 
-	return responseBody, nil
+	return responseBody, err
 }
